@@ -15,10 +15,21 @@ use Exception;
 
 class InvoiceController extends Controller
 {
+    
     public function index()
     {
         try {
-            $invoices = Invoice::with(['user', 'booking'])->get();
+            $invoices = Invoice::with([
+                'user',  
+                'booking' => function ($query) {
+                    $query->with(['adSlot' => function ($query) {
+                        $query->select('ad_slot_id', 'ad_type');
+                    }]);
+                }
+            ])
+            ->orderBy('invoice_id', 'desc')  // Added ordering by invoice_id descending
+            ->get();  // Get ALL invoices without any user filtering
+    
             return InvoiceResource::collection($invoices);
         } catch (Exception $e) {
             return response()->json([
@@ -27,29 +38,33 @@ class InvoiceController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
 
     public function loggedUserInvoices()
-    {
-        try {
-            $user = auth()->user();
-            $invoices = Invoice::where('user_id', $user->id)
-                ->with(['booking' => function ($query) {
-                    $query->select('booking_id', 'ad_slot_id', 'quantity', 'total_cost', 'duration_type', 'duration_value')
-                          ->with(['adSlot' => function ($query) {
-                              $query->select('ad_slot_id', 'ad_unit', 'image', 'dimensions', 'platform');
-                          }]);
-                }])
-                ->select('invoice_id', 'user_id', 'booking_id', 'invoice_number', 'total_amount', 'status', 'created_at')
-                ->get();
+{
+    try {
+        $user = auth()->user();
+        $invoices = Invoice::where('user_id', $user->user_id)
+            ->with(['booking' => function ($query) {
+                $query->select('booking_id', 'ad_slot_id', 'quantity', 'total_cost', 'duration_type', 'duration_value')
+                      ->with(['adSlot' => function ($query) {
+                          $query->select('ad_slot_id', 'ad_unit', 'image', 'dimensions', 'platform');
+                      }]);
+            }])
+            ->select('invoice_id', 'user_id', 'booking_id', 'invoice_number', 'total_amount', 'status', 'created_at')
+            ->orderBy('invoice_id', 'desc')
+            ->get();
 
-            return InvoiceResource::collection($invoices);
-        } catch (Exception $e) {
-            return response()->json([
-                'message' => 'Failed to fetch invoices',
-                'error' => $e->getMessage()
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        return InvoiceResource::collection($invoices);
+    } catch (Exception $e) {
+        return response()->json([
+            'message' => 'Failed to fetch invoices',
+            'error' => $e->getMessage()
+        ], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
+}
+
+
 
     public function store(Request $request)
     {
@@ -226,4 +241,22 @@ class InvoiceController extends Controller
             return false;
         }
     }
+
+
+
+    public function totalInvoices()
+{
+    try {
+        $totalCount = Invoice::count(); 
+        return response()->json([
+            'message' => 'Total invoices retrieved successfully',
+            'total_invoices' => $totalCount
+        ], Response::HTTP_OK);
+    } catch (Exception $e) {
+        return response()->json([
+            'message' => 'Failed to retrieve total invoices',
+            'error' => $e->getMessage()
+        ], Response::HTTP_INTERNAL_SERVER_ERROR);
+    }
+}
 }

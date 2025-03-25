@@ -56,15 +56,7 @@ const getNavItemsForRole = (roleId: number) => {
       ), // Shield icon for authority/management
       subItems: [{ name: "Manage roles", path: "/user-roles" }],
     },    
-    {
-      name: "Departments",
-      icon: (
-        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-500 text-white">
-          🏢
-        </span>
-      ), // Gray for departments (structural/organizational)
-      subItems: [{ name: "Manage departments", path: "/departments" }],
-    },
+  
     {
       name: "Users",
       icon: (
@@ -84,34 +76,40 @@ const getNavItemsForRole = (roleId: number) => {
       subItems: [{ name: "View logs", path: "/user-logs" }],
     },
     {
-      name: "Requests",
+      name: "Ad-slots",
       icon: (
         <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-orange-500 text-white">
-          🙋
+          📢
         </span>
-      ), // Orange for requests (attention/action)
-      subItems: [{ name: "Approve request", path: "/requests" },
-        { name: "Approved requests", path: "/approved-requests" },
-      ],
-      
+      ), // Megaphone icon for advertising
+      subItems: [{ name: "Manage Ad-slots", path: "/ad-slots" }],
     },
     {
-      name: "Dispatched-Assets",
+      name: "Bookings",
+      icon: (
+        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-orange-500 text-white">
+          📅
+        </span>
+      ), // Calendar icon for bookings
+      subItems: [{ name: "Manage bookings", path: "/bookings" }],
+    },
+    {
+      name: "Invoices",
       icon: (
         <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-purple-500 text-white">
-          🚚
+          📄
         </span>
-      ), // Purple for dispatched (movement/delivery)
-      subItems: [{ name: "Manage dispatches", path: "/dispatches" }],
+      ), // Document icon for invoices
+      subItems: [{ name: "View invoices", path: "/view-invoices" }],
     },
     {
-      name: "Restocked-Assets",
+      name: "Payments",
       icon: (
-        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-cyan-500 text-white">
-          🔄
+        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white">
+          💳
         </span>
-      ), // Cyan for restocked (refresh/replenishment)
-      subItems: [{ name: "View restocked devices", path: "/restocks" }],
+      ), // Credit card icon for payments
+      subItems: [{ name: "Manage payments", path: "/payments" }],
     },
   
   ];
@@ -145,7 +143,7 @@ const getNavItemsForRole = (roleId: number) => {
           💳
         </span>
       ), // Credit card icon for payments
-      subItems: [{ name: "View payments", path: "/user-restocks" }],
+      subItems: [{ name: "View payments", path: "/view-payments" }],
     },
     
   ];
@@ -391,7 +389,7 @@ const AppSidebar: React.FC = () => {
     return (
       <aside className="fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 shadow-lg w-[290px]">
         <div className="py-8 flex justify-start">
-          <h1>EAMS</h1>
+          <h1>Digital Ad-Slot Portal</h1>
         </div>
         <div>Loading sidebar...</div>
       </aside>
@@ -421,11 +419,11 @@ const AppSidebar: React.FC = () => {
         <Link to="/dashboard">
           {isExpanded || isHovered || isMobileOpen ? (
             <>
-              <h1 className="dark:hidden shadow-sm">EAMS</h1>
-              <h1 className="hidden dark:block shadow-sm">EAMS</h1>
+              <h1 className="dark:hidden shadow-sm">Digital Ad-Slot Portal</h1>
+              <h1 className="hidden dark:block shadow-sm">Digital Ad-Slot Portal</h1>
             </>
           ) : (
-            <h1>EAMS</h1>
+            <h1>Digital Ad-Slot Portal</h1>
           )}
         </Link>
       </div>

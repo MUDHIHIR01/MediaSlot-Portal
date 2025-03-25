@@ -6,6 +6,7 @@ use App\Http\Resources\BookingResource;
 use App\Models\Booking;
 use App\Models\Invoice;
 use App\Models\AdSlot;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -17,38 +18,64 @@ use Exception;
 
 class BookingController extends Controller
 {
+  
+
     public function index()
-    {
-        try {
-            $bookings = Booking::with(['user', 'adSlot'])->get();
-            return BookingResource::collection($bookings);
-        } catch (Exception $e) {
-            return response()->json([
-                'message' => 'Failed to fetch bookings',
-                'error' => $e->getMessage()
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+{
+    try {
+        $bookings = Booking::with(['user', 'adSlot'])
+            ->orderBy('booking_id', 'desc')
+            ->get();
+        return BookingResource::collection($bookings);
+    } catch (Exception $e) {
+        return response()->json([
+            'message' => 'Failed to fetch bookings',
+            'error' => $e->getMessage()
+        ], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
+}
 
-    public function loggedUserBookings()
-    {
-        try {
-            $user = auth()->user();
-            $bookings = Booking::where('user_id', $user->id)
-                ->with(['adSlot' => function ($query) {
-                    $query->select('ad_slot_id', 'ad_unit', 'image', 'dimensions', 'platform');
-                }])
-                ->select('booking_id', 'user_id', 'ad_slot_id', 'quantity', 'total_cost', 'duration_type', 'duration_value', 'status', 'created_at')
-                ->get();
-
-            return BookingResource::collection($bookings);
-        } catch (Exception $e) {
+public function loggedUserBookings()
+{
+    try {
+        // Check if user is authenticated
+        if (!Auth::check()) {
             return response()->json([
-                'message' => 'Failed to fetch bookings',
-                'error' => $e->getMessage()
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+                'message' => 'User not authenticated',
+                'auth_check' => false
+            ], Response::HTTP_UNAUTHORIZED);
         }
+
+        $user = Auth::user();
+        
+        if (!$user) {
+            return response()->json([
+                'message' => 'Unable to retrieve authenticated user',
+                'user_id' => Auth::id()
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+        
+        $bookings = Booking::with(['user', 'adSlot'])
+            ->where('user_id', $user->user_id)
+            ->orderBy('booking_id', 'desc')
+            ->get();
+            
+        if ($bookings->isEmpty()) {
+            return response()->json([
+                'message' => 'No bookings found for user',
+                'user_id' => $user->id
+            ]);
+        }
+            
+        return BookingResource::collection($bookings);
+        
+    } catch (Exception $e) {
+        return response()->json([
+            'message' => 'Failed to fetch bookings',
+            'error' => $e->getMessage()
+        ], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
+}
 
     
     public function store(Request $request)
@@ -213,4 +240,136 @@ private function calculateSlotCost(AdSlot $adSlot, $quantity, $durationType, $du
             return false;
         }
     }
+
+
+    public function show($booking_id)
+{
+    try {
+        $booking = Booking::with(['user', 'adSlot'])
+            ->where('booking_id', $booking_id)
+            ->firstOrFail();
+        
+        return new BookingResource($booking);
+    } catch (Exception $e) {
+        return response()->json([
+            'message' => 'Failed to fetch booking',
+            'error' => $e->getMessage()
+        ], Response::HTTP_NOT_FOUND);
+    }
+}
+
+
+public function update(Request $request, $booking_id)
+{
+    try {
+        $booking = Booking::findOrFail($booking_id);
+
+        // Check if user is authenticated and authorized (admin only)
+        if (!Auth::check() || Auth::user()->role_id !== 1) {
+            return response()->json([
+                'message' => 'Unauthorized to update booking status'
+            ], Response::HTTP_FORBIDDEN);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'status' => 'required|in:pending,confirmed,rejected'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $newStatus = $request->status;
+        $booking->status = $newStatus;
+        $booking->save();
+
+        // Send email to user if status changed to confirmed
+        if ($newStatus === 'confirmed') {
+            $user = User::find($booking->user_id);
+            $adSlot = AdSlot::find($booking->ad_slot_id);
+            
+            if ($user && $adSlot) {
+                $emailBody = "Dear {$user->name},\n\n"
+                    . "Your booking has been confirmed!\n"
+                    . "Details:\n"
+                    . "Ad Slot: {$adSlot->ad_unit} ({$adSlot->dimensions}, {$adSlot->platform})\n"
+                    . "Quantity: {$booking->quantity}\n"
+                    . "Duration: {$booking->duration_type}" . ($booking->duration_value ? " ({$booking->duration_value})" : '') . "\n"
+                    . "Total Cost: {$booking->total_cost}\n"
+                    . "Confirmed At: " . now()->toDateTimeString() . "\n\n"
+                    . "Thank you for your booking!";
+
+                Mail::raw($emailBody, function ($message) use ($user) {
+                    $message->to($user->email)
+                           ->subject('Booking Confirmation');
+                });
+                
+                Log::info('Confirmation email sent to user', [
+                    'user_id' => $user->id,
+                    'booking_id' => $booking->booking_id
+                ]);
+            }
+        }
+
+        return response()->json([
+            'message' => 'Booking status updated successfully',
+            'booking' => new BookingResource($booking)
+        ], Response::HTTP_OK);
+
+    } catch (Exception $e) {
+        return response()->json([
+            'message' => 'Failed to update booking status',
+            'error' => $e->getMessage()
+        ], Response::HTTP_INTERNAL_SERVER_ERROR);
+    }
+}
+
+
+
+    public function destroy($booking_id)
+{
+    try {
+        $booking = Booking::findOrFail($booking_id);
+
+        if (!Auth::check() || (Auth::id() !== $booking->user_id && Auth::user()->role_id !== 1)) {
+            return response()->json([
+                'message' => 'Unauthorized to delete this booking'
+            ], Response::HTTP_FORBIDDEN);
+        }
+
+        $booking->delete();
+
+        return response()->json([
+            'message' => 'Booking deleted successfully',
+            'booking_id' => $booking_id
+        ], Response::HTTP_OK);
+
+    } catch (Exception $e) {
+        return response()->json([
+            'message' => 'Failed to delete booking',
+            'error' => $e->getMessage()
+        ], Response::HTTP_NOT_FOUND);
+    }
+}
+
+
+
+public function totalBookings()
+{
+    try {
+        $totalCount = Booking::count(); 
+        return response()->json([
+            'message' => 'Total bookings retrieved successfully',
+            'total_bookings' => $totalCount
+        ], Response::HTTP_OK);
+    } catch (Exception $e) {
+        return response()->json([
+            'message' => 'Failed to retrieve total bookings',
+            'error' => $e->getMessage()
+        ], Response::HTTP_INTERNAL_SERVER_ERROR);
+    }
+}
 }

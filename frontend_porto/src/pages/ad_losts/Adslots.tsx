@@ -8,25 +8,33 @@ import axiosInstance from "../../axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-// Define the UserData interface
-interface UserData {
-  user_id: number;
-  name: string;
-  email: string;
-  status: string;
-  role: string;
-  created_at?: string;
+// Define the AdSlotData interface based on the API response
+interface AdSlotData {
+  ad_slot_id: number;
+  ad_type: string;
+  ad_unit: string;
+  dimensions: string;
+  device: string;
+  platform: string;
+  placement_type: string;
+  rate: string;
+  rate_unit: string;
+  duration_limit: string;
+  available: number; // 1 for true, 0 for false
+  image: string;
+  created_at: string;
+  updated_at: string;
 }
 
-// ActionButtons component with typed props
-const ActionButtons: React.FC<{ userId: number }> = ({ userId }) => {
+// ActionButtons component updated for ad slots
+const ActionButtons: React.FC<{ adSlotId: number }> = ({ adSlotId }) => {
   const [showConfirm, setShowConfirm] = useState(false);
 
   const handleDelete = async () => {
     try {
-      const response = await axiosInstance.delete(`/api/auth/user/${userId}`);
+      const response = await axiosInstance.delete(`/api/ad-slots/${adSlotId}`);
       if (response.status === 200) {
-        toast.success(response.data.message || 'User deleted successfully', {
+        toast.success(response.data.message || 'Ad slot deleted successfully', {
           position: "top-right"
         });
         setTimeout(() => {
@@ -34,7 +42,7 @@ const ActionButtons: React.FC<{ userId: number }> = ({ userId }) => {
         }, 1500);
       }
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Failed to delete user';
+      const errorMessage = err.response?.data?.message || 'Failed to delete ad slot';
       toast.error(errorMessage, {
         position: "top-right"
       });
@@ -52,7 +60,7 @@ const ActionButtons: React.FC<{ userId: number }> = ({ userId }) => {
   return (
     <div className="relative">
       <div className="flex gap-2 items-center">
-        <Link to={`/edit-user/${userId}`} className="p-1 text-blue-500 hover:text-blue-600">
+        <Link to={`/edit/ad-slot/${adSlotId}`} className="p-1 text-blue-500 hover:text-blue-600">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
           </svg>
@@ -71,7 +79,7 @@ const ActionButtons: React.FC<{ userId: number }> = ({ userId }) => {
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">
-              Are you sure you want to delete this user?
+              Are you sure you want to delete this ad slot?
             </h3>
             <div className="flex justify-end gap-4">
               <button
@@ -94,60 +102,78 @@ const ActionButtons: React.FC<{ userId: number }> = ({ userId }) => {
   );
 };
 
-// Main Users component
-const Users: React.FC = () => {
-  const [data, setData] = useState<UserData[]>([]);
+// Main AdSlots component
+const AdSlots: React.FC = () => {
+  const [data, setData] = useState<AdSlotData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchUsers = async () => {
+  const fetchAdSlots = async () => {
     try {
-      const response = await axiosInstance.get<{ users: UserData[] }>('/api/all/users');
-      setData(response.data.users || []);
+      const response = await axiosInstance.get('/api/ad-slots');
+      const adSlots = response.data.data || [];
+      setData(adSlots);
       setLoading(false);
     } catch (err: any) {
-      setError('Failed to fetch users: ' + (err.response?.data?.message || err.message));
-      toast.error('Failed to fetch users', { position: "top-right" });
+      setError('Failed to fetch ad slots: ' + (err.response?.data?.message || err.message));
+      toast.error('Failed to fetch ad slots', { position: "top-right" });
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchUsers();
+    fetchAdSlots();
   }, []);
 
-  const columns: Column<UserData>[] = useMemo(() => [
+  const columns: Column<AdSlotData>[] = useMemo(() => [
     {
       Header: '#',
-      accessor: 'count' as any, // Type assertion since 'count' isn't in UserData
-      Cell: ({ row }: { row: Row<UserData> }) => <span>{row.index + 1}</span>,
+      Cell: ({ row }: { row: Row<AdSlotData> }) => <span>{row.index + 1}</span>,
       width: 50
     },
-    { Header: 'Name', accessor: 'name' },
-    { Header: 'Role', accessor: 'role' },
-    { Header: 'Email', accessor: 'email' },
+    { Header: 'Ad Type', accessor: 'ad_type' },
+    { Header: 'Ad Unit', accessor: 'ad_unit' },
+    { Header: 'Dimensions', accessor: 'dimensions' },
+    { Header: 'Device', accessor: 'device' },
+    { Header: 'Platform', accessor: 'platform' },
     { 
-      Header: 'Status', 
-      accessor: 'status',
+      Header: 'Rate', 
+      accessor: 'rate',
+      Cell: ({ value, row }: { value: string; row: Row<AdSlotData> }) => (
+        `${value} ${row.original.rate_unit}`
+      )
+    },
+    { 
+      Header: 'Availability', 
+      accessor: 'available',
+      Cell: ({ value }: { value: number }) => (
+        <span className={value === 1 ? 'text-green-500' : 'text-red-500'}>
+          {value === 1 ? 'Available' : 'Not Available'}
+        </span>
+      )
+    },
+    { 
+      Header: 'Image', 
+      accessor: 'image',
       Cell: ({ value }: { value: string }) => (
-        <button className="px-2 py-1 bg-green-500 text-white text-xs rounded">
-          {value === 'is_active' ? 'Active' : 'Not Active'}
-        </button>
+        <a href={value} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+          View
+        </a>
       )
     },
     { 
       Header: 'Created At', 
       accessor: 'created_at',
-      Cell: ({ value }: { value: string | undefined }) => value || 'N/A'
+      Cell: ({ value }: { value: string }) => new Date(value).toLocaleDateString()
     },
     {
       Header: 'Actions',
-      accessor: 'user_id',
-      Cell: ({ value }: { value: number }) => <ActionButtons userId={value} />,
+      accessor: 'ad_slot_id',
+      Cell: ({ value }: { value: number }) => <ActionButtons adSlotId={value} />,
     },
   ], []);
 
-  const tableInstance = useTable<UserData>(
+  const tableInstance = useTable<AdSlotData>(
     { 
       columns, 
       data, 
@@ -175,19 +201,23 @@ const Users: React.FC = () => {
 
   const exportToPDF = () => {
     const doc = new jsPDF();
-    doc.text('Users Data', 20, 10);
+    doc.text('Ad Slots Data', 20, 10);
     autoTable(doc, {
-      head: [['#', 'Name', 'Role', 'Email', 'Status', 'Created At']],
+      head: [['#', 'Ad Type', 'Ad Unit', 'Dimensions', 'Device', 'Platform', 'Rate', 'Availability', 'Image', 'Created At']],
       body: data.map((row, index) => [
         index + 1,
-        row.name,
-        row.role,
-        row.email,
-        row.status,
-        row.created_at || 'N/A'
+        row.ad_type,
+        row.ad_unit,
+        row.dimensions,
+        row.device,
+        row.platform,
+        `${row.rate} ${row.rate_unit}`,
+        row.available === 1 ? 'Available' : 'Not Available',
+        row.image,
+        new Date(row.created_at).toLocaleDateString()
       ]),
     });
-    doc.save('users_data.pdf');
+    doc.save('ad_slots_data.pdf');
     toast.success('PDF exported successfully');
   };
 
@@ -195,16 +225,20 @@ const Users: React.FC = () => {
     const worksheet = XLSX.utils.json_to_sheet(
       data.map((row, index) => ({
         count: index + 1,
-        name: row.name,
-        role: row.role,
-        email: row.email,
-        status: row.status,
-        created_at: row.created_at || 'N/A'
+        ad_type: row.ad_type,
+        ad_unit: row.ad_unit,
+        dimensions: row.dimensions,
+        device: row.device,
+        platform: row.platform,
+        rate: `${row.rate} ${row.rate_unit}`,
+        availability: row.available === 1 ? 'Available' : 'Not Available',
+        image: row.image,
+        created_at: new Date(row.created_at).toLocaleDateString()
       }))
     );
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Users');
-    XLSX.writeFile(workbook, 'users_data.xlsx');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'AdSlots');
+    XLSX.writeFile(workbook, 'ad_slots_data.xlsx');
     toast.success('Excel exported successfully');
   };
 
@@ -226,9 +260,9 @@ const Users: React.FC = () => {
       />
       <div className="bg-white rounded-xl shadow-lg p-6 w-full">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-lg text-gray-800">Users Management</h2>
+          <h2 className="text-lg text-gray-800">Ad Slots Management</h2>
           <Link
-            to="/create-user"
+            to="/create/ad-slot"
             className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition shadow-md"
           >
             <svg
@@ -240,7 +274,7 @@ const Users: React.FC = () => {
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-            Create User
+            Create Ad Slot
           </Link>
         </div>
 
@@ -248,7 +282,7 @@ const Users: React.FC = () => {
           <input
             value={globalFilter || ''}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGlobalFilter(e.target.value)}
-            placeholder="Search users..."
+            placeholder="Search ad slots..."
             className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-64 shadow-sm"
           />
           <div className="flex gap-2">
@@ -338,4 +372,4 @@ const Users: React.FC = () => {
   );
 };
 
-export default Users;
+export default AdSlots;

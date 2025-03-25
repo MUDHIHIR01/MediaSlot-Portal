@@ -27,30 +27,35 @@ class AdSlotController extends Controller
     }
 
     public function indexV1()
-    {
-        try {
-            $adSlots = AdSlot::where('available', true)->get();
-            return AdSlotResource::collection($adSlots);
-        } catch (Exception $e) {
-            return response()->json([
-                'message' => 'Failed to fetch ad slots',
-                'error' => $e->getMessage()
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+{
+    try {
+        $adSlots = AdSlot::where('available', true)
+                        ->orderBy('ad_slot_id', 'desc')
+                        ->get();
+        return AdSlotResource::collection($adSlots);
+    } catch (Exception $e) {
+        return response()->json([
+            'message' => 'Failed to fetch ad slots',
+            'error' => $e->getMessage()
+        ], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
+}
 
-    public function index()
-    {
-        try {
-            $adSlots = AdSlot::where('available', true)->get();
-            return AdSlotResource::collection($adSlots);
-        } catch (Exception $e) {
-            return response()->json([
-                'message' => 'Failed to fetch ad slots',
-                'error' => $e->getMessage()
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+public function index()
+{
+    try {
+        $adSlots = AdSlot::where('available', true)
+                        ->orderBy('ad_slot_id', 'desc')
+                        ->get();
+        return AdSlotResource::collection($adSlots);
+    } catch (Exception $e) {
+        return response()->json([
+            'message' => 'Failed to fetch ad slots',
+            'error' => $e->getMessage()
+        ], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
+}
+
 
     public function store(Request $request)
     {
@@ -59,11 +64,11 @@ class AdSlotController extends Controller
                 'ad_type' => 'required|string|max:255',
                 'ad_unit' => 'required|string|max:255',
                 'dimensions' => 'required|string|max:50',
-                'device' => 'required|string|in:Desktop & Mobile,Desktop Only,Mobile Only',
+                'device' => 'required|string|',
                 'platform' => 'required|string|max:255',
                 'placement_type' => 'required|string|max:255',
                 'rate' => 'required|string',
-                'rate_unit' => 'required|string|in:CPM USD,TZS per hour,TZS per day,TZS',
+                'rate_unit' => 'required|string',
                 'duration_limit' => 'nullable|string|max:255',
                 'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
             ]);
@@ -125,60 +130,53 @@ class AdSlotController extends Controller
         }
     }
 
+  
     public function update(Request $request, $ad_slot_id)
-    {
-        try {
-            $validator = Validator::make($request->all(), [
-                'ad_type' => 'nullable|string|max:255',
-                'ad_unit' => 'nullable|string|max:255',
-                'dimensions' => 'nullable|string|max:50',
-                'device' => 'nullable|string|in:Desktop & Mobile,Desktop Only,Mobile Only',
-                'platform' => 'nullable|string|max:255',
-                'placement_type' => 'nullable|string|max:255',
-                'rate' => 'nullable|numeric|min:0',
-                'rate_unit' => 'nullable|string|in:CPM USD,TZS per hour,TZS per day,TZS',
-                'duration_limit' => 'nullable|string|max:255',
-                'available' => 'nullable|boolean',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            ]);
+{
+    try {
+        $validator = Validator::make($request->all(), [
+            'ad_type' => 'nullable|string|max:255',
+            'ad_unit' => 'nullable|string|max:255',
+            'dimensions' => 'nullable|string|max:50',
+            'device' => 'nullable|string',
+            'platform' => 'nullable|string|max:255',
+            'placement_type' => 'nullable|string|max:255',
+            'rate' => 'nullable|numeric|min:0',
+            'rate_unit' => 'nullable|string',
+            'duration_limit' => 'nullable|string|max:255',
+            'available' => 'nullable|boolean',
+        ]);
 
-            if ($validator->fails()) {
-                return response()->json([
-                    'message' => 'Validation failed',
-                    'errors' => $validator->errors()
-                ], Response::HTTP_UNPROCESSABLE_ENTITY);
-            }
-
-            $adSlot = AdSlot::findOrFail($ad_slot_id);
-            $data = $request->all();
-
-            if ($request->hasFile('image')) {
-                $imageUrl = $this->uploadImageToCloudinary($request);
-                if ($imageUrl) {
-                    $data['image'] = $imageUrl;
-                } else {
-                    return response()->json([
-                        'message' => 'Failed to upload image'
-                    ], Response::HTTP_BAD_REQUEST);
-                }
-            }
-
-            $adSlot->update($data);
-            return (new AdSlotResource($adSlot))
-                ->additional(['message' => 'Ad slot updated successfully'])
-                ->response()
-                ->setStatusCode(Response::HTTP_OK);
-        } catch (Exception $e) {
-            Log::error('Ad slot update failed', [
-                'ad_slot_id' => $ad_slot_id,
-                'error' => $e->getMessage()
-            ]);
+        if ($validator->fails()) {
             return response()->json([
-                'message' => 'Failed to update ad slot',
-                'error' => $e->getMessage()
-            ], $e->getCode() === '404' ? Response::HTTP_NOT_FOUND : Response::HTTP_INTERNAL_SERVER_ERROR);
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
+
+        $adSlot = AdSlot::findOrFail($ad_slot_id);
+        $data = $request->all();
+
+        $adSlot->update($data);
+
+        return (new AdSlotResource($adSlot))
+            ->additional(['message' => 'Ad slot updated successfully'])
+            ->response()
+            ->setStatusCode(Response::HTTP_OK);
+
+    } catch (Exception $e) {
+        Log::error('Ad slot update failed', [
+            'ad_slot_id' => $ad_slot_id,
+            'error' => $e->getMessage()
+        ]);
+
+        return response()->json([
+            'message' => 'Failed to update ad slot',
+            'error' => $e->getMessage()
+        ], $e->getCode() === '404' ? Response::HTTP_NOT_FOUND : Response::HTTP_INTERNAL_SERVER_ERROR);
     }
+}
+
 
     public function destroy($ad_slot_id)
     {
@@ -210,4 +208,21 @@ class AdSlotController extends Controller
         }
         return null;
     }
+
+
+    public function totalSlots()
+{
+    try {
+        $totalCount = AdSlot::count();
+        return response()->json([
+            'message' => 'Total ad slots retrieved successfully',
+            'total_slots' => $totalCount
+        ], Response::HTTP_OK);
+    } catch (Exception $e) {
+        return response()->json([
+            'message' => 'Failed to retrieve total ad slots',
+            'error' => $e->getMessage()
+        ], Response::HTTP_INTERNAL_SERVER_ERROR);
+    }
+}
 }

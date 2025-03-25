@@ -4,7 +4,7 @@ import axios from 'axios';
 // Create axios instance with base URL
 const axiosInstance = axios.create({
   // baseURL: 'https://bpm.teratech.co.tz/',
-    baseURL: 'http://192.168.43.145:8000/',
+    baseURL: 'http://192.168.8.38:8000/',
   headers: {
     'Content-Type': 'application/json',
   },

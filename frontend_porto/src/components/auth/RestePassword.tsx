@@ -152,8 +152,8 @@ export default function ResetPasswordForm() {
               
               <div className="text-center">
                 <Link 
-                  to="/" 
-                  className="text-sm text-blue-600 hover:underline dark:text-blue-400"
+                  to="/sign-in" 
+                  className="text-sm text-blue-500 hover:underline dark:text-blue-400"
                 >
                   Back Home
                 </Link>

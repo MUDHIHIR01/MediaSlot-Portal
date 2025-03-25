@@ -12,7 +12,6 @@ export default function EditUser() {
     email: "",
     status: "",
     role_id: "",
-    department_id: "",
     password: ""
   });
   const [errors, setErrors] = useState({
@@ -20,49 +19,40 @@ export default function EditUser() {
     email: "",
     status: "",
     role_id: "",
-    department_id: "",
     password: ""
   });
   const [loading, setLoading] = useState(false);
-  const [departments, setDepartments] = useState([]);
   const [roles, setRoles] = useState([]);
 
-  // Fetch user data and dropdown options
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [userResponse, deptResponse, roleResponse] = await Promise.all([
-          axiosInstance.get(`/api/all/users`), // Fetch all users to find the specific one
-          axiosInstance.get('/api/dropdown/department'),
+        const [userResponse, roleResponse] = await Promise.all([
+          axiosInstance.get(`/api/all/users`),
           axiosInstance.get('/api/roles/dropdown-options')
         ]);
 
-        const user = userResponse.data.users.find((u: any) => u.user_id === parseInt(userId || ""));
+        const user = userResponse.data.users.find((u) => u.user_id === parseInt(userId || ""));
         if (user) {
           setFormData({
             name: user.name,
             email: user.email,
             status: user.status,
-            role_id: "", // Will be set from dropdown fetch
-            department_id: "", // Will be set from dropdown fetch
+            role_id: "",
             password: ""
           });
         }
 
-        setDepartments(deptResponse.data.departments || []);
         setRoles(roleResponse.data || []);
 
-        // Set role_id and department_id after fetching dropdowns
         if (user) {
-          const role = roleResponse.data.find((r: any) => r.category === user.role);
-          const dept = deptResponse.data.departments.find((d: any) => d.name === user.department);
+          const role = roleResponse.data.find((r) => r.category === user.role);
           setFormData(prev => ({
             ...prev,
-            role_id: role ? role.role_id.toString() : "",
-            department_id: dept ? dept.department_id.toString() : ""
+            role_id: role ? role.role_id.toString() : ""
           }));
         }
-      } catch (error: any) {
+      } catch (error) {
         toast.error("Failed to fetch user data or dropdown options");
         navigate("/users");
       }
@@ -70,11 +60,11 @@ export default function EditUser() {
     fetchData();
   }, [userId, navigate]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
     
-    if (errors[name as keyof typeof errors]) {
+    if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: "" }));
     }
   };
@@ -86,7 +76,6 @@ export default function EditUser() {
       email: "",
       status: "",
       role_id: "",
-      department_id: "",
       password: ""
     };
 
@@ -131,7 +120,7 @@ export default function EditUser() {
     return isValid;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!validateForm()) {
@@ -146,8 +135,7 @@ export default function EditUser() {
         email: formData.email,
         status: formData.status,
         role_id: parseInt(formData.role_id),
-        department_id: formData.department_id ? parseInt(formData.department_id) : null,
-        ...(formData.password && { password: formData.password }) // Only include password if filled
+        ...(formData.password && { password: formData.password })
       };
 
       const response = await axiosInstance.put(`/api/update-user/${userId}`, payload);
@@ -155,7 +143,7 @@ export default function EditUser() {
         toast.success(response.data.message || "User updated successfully");
         setTimeout(() => navigate("/users"), 3000);
       }
-    } catch (error: any) {
+    } catch (error) {
       const errorResponse = error.response?.data;
       if (errorResponse?.errors) {
         setErrors(prev => ({ ...prev, ...errorResponse.errors }));
@@ -181,7 +169,7 @@ export default function EditUser() {
         closeButton
       />
       <div className="bg-white rounded-lg shadow-lg p-6">
-        <h2 className="text-lg  mb-6">Edit User</h2>
+        <h2 className="text-lg mb-6">Edit User</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name *</label>
@@ -237,31 +225,13 @@ export default function EditUser() {
               required
             >
               <option value="">Select a role</option>
-              {roles.map((role: { role_id: number; category: string }) => (
+              {roles.map((role) => (
                 <option key={role.role_id} value={role.role_id}>
                   {role.category}
                 </option>
               ))}
             </select>
             {errors.role_id && <p className="mt-1 text-sm text-red-500">{errors.role_id}</p>}
-          </div>
-
-          <div>
-            <label htmlFor="department_id" className="block text-sm font-medium text-gray-700">Department</label>
-            <select
-              name="department_id"
-              value={formData.department_id}
-              onChange={handleChange}
-              className={`w-full p-2 border rounded-md ${errors.department_id ? 'border-red-500' : 'border-gray-300'}`}
-            >
-              <option value="">Select a department (optional)</option>
-              {departments.map((dept: { department_id: number; name: string }) => (
-                <option key={dept.department_id} value={dept.department_id}>
-                  {dept.name}
-                </option>
-              ))}
-            </select>
-            {errors.department_id && <p className="mt-1 text-sm text-red-500">{errors.department_id}</p>}
           </div>
 
           <div>

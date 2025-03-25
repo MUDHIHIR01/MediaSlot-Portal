@@ -10,7 +10,6 @@ export default function CreateUser() {
     name: '',
     email: '',
     password: '',
-    department_id: '',
     role_id: '',
     status: ''
   });
@@ -18,23 +17,18 @@ export default function CreateUser() {
     name: '',
     email: '',
     password: '',
-    department_id: '',
     role_id: '',
     status: ''
   });
   const [loading, setLoading] = useState(false);
-  const [departments, setDepartments] = useState([]);
   const [roles, setRoles] = useState([]);
 
   useEffect(() => {
     const fetchDropdownData = async () => {
       try {
-        const deptResponse = await axiosInstance.get('/api/dropdown/department');
         const roleResponse = await axiosInstance.get('/api/roles/dropdown-options');
-        
-        setDepartments(deptResponse.data.departments || []);
         setRoles(roleResponse.data || []);
-      } catch (error: any) {
+      } catch (error) {
         console.error('Error fetching dropdown data:', error);
         toast.error('Failed to load dropdown options', {
           position: "top-right"
@@ -45,14 +39,14 @@ export default function CreateUser() {
     fetchDropdownData();
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
     
-    if (errors[name as keyof typeof errors]) {
+    if (errors[name]) {
       setErrors(prev => ({
         ...prev,
         [name]: ''
@@ -66,7 +60,6 @@ export default function CreateUser() {
       name: '', 
       email: '', 
       password: '', 
-      department_id: '', 
       role_id: '', 
       status: ''
     };
@@ -112,7 +105,7 @@ export default function CreateUser() {
     return isValid;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!validateForm()) {
@@ -124,11 +117,10 @@ export default function CreateUser() {
     const minLoadingTime = new Promise(resolve => setTimeout(resolve, 3000));
     
     try {
-      const apiCall = axiosInstance.post('http://192.168.100.112:8000/api/auth/add-user', {
+      const apiCall = axiosInstance.post('/api/auth/add-user', {
         name: formData.name,
         email: formData.email,
         password: formData.password,
-        department_id: formData.department_id ? parseInt(formData.department_id) : null,
         role_id: parseInt(formData.role_id),
         status: formData.status
       });
@@ -143,7 +135,7 @@ export default function CreateUser() {
           navigate('/users');
         }, 3000);
       }
-    } catch (error: any) {
+    } catch (error) {
       const errorResponse = error.response?.data;
       if (errorResponse?.errors) {
         setErrors(prev => ({
@@ -165,7 +157,7 @@ export default function CreateUser() {
       <ToastContainer
         position="top-right"
         autoClose={3000}
-        style={{ top: "70px" }} // Changed from 10px to 70px to avoid full top
+        style={{ top: "70px" }}
         closeOnClick
         pauseOnHover
         draggable
@@ -217,30 +209,6 @@ export default function CreateUser() {
             {errors.email && <p className="mt-1 text-sm text-red-500">{errors.email}</p>}
           </div>
 
-       
-          <div>
-            <label htmlFor="department_id" className="block text-sm font-medium text-gray-700">
-              Department
-            </label>
-            <select
-              id="department_id"
-              name="department_id"
-              value={formData.department_id}
-              onChange={handleChange}
-              className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${
-                errors.department_id ? 'border-red-500' : ''
-              }`}
-            >
-              <option value="">Select a department (optional)</option>
-              {departments.map((dept: { department_id: number; name: string }) => (
-                <option key={dept.department_id} value={dept.department_id}>
-                  {dept.name}
-                </option>
-              ))}
-            </select>
-            {errors.department_id && <p className="mt-1 text-sm text-red-500">{errors.department_id}</p>}
-          </div>
-
           <div>
             <label htmlFor="role_id" className="block text-sm font-medium text-gray-700">
               Role *
@@ -255,7 +223,7 @@ export default function CreateUser() {
               }`}
             >
               <option value="">Select a role</option>
-              {roles.map((role: { role_id: number; category: string }) => (
+              {roles.map((role) => (
                 <option key={role.role_id} value={role.role_id}>
                   {role.category}
                 </option>
@@ -301,7 +269,6 @@ export default function CreateUser() {
             />
             {errors.password && <p className="mt-1 text-sm text-red-500">{errors.password}</p>}
           </div>
-
 
           <div className="flex justify-end gap-4">
             <button

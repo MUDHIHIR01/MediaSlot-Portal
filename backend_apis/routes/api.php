@@ -52,9 +52,6 @@ Route::middleware(['auth:sanctum', 'token.expiration'])->group(function () {
     Route::post('/store-cookies', [AuthController::class, 'storeCookies']);
     
 
-//admin,hod,account and engineers rout drop dropdown
-Route::get('/dropdown/engineer', [AuthController::class, 'EngineersDropDown']);
-
 
     //roles route
     Route::apiResource('/auth/roles', RoleController::class);
@@ -64,19 +61,19 @@ Route::get('/dropdown/engineer', [AuthController::class, 'EngineersDropDown']);
 
     //slots rout(create,view,edit and delete)
     Route::apiResource('/ad-slots', AdSlotController::class);
-    
+    Route::get('/count/ad-slots', [AdSlotController::class, 'totalSlots']);
     
 
     // Bookings(create,view,edit and delete)
     Route::apiResource('/bookings',BookingController::class);
     Route::get('/loggedUserBookings', [BookingController::class, 'loggedUserBookings']);
+    Route::get('/count/bookings', [BookingController::class, 'totalBookings']);
+
 
     // Invoices(create,view,edit and delete)
     Route::apiResource('/invoices', InvoiceController::class);
     Route::get('/loggedUserInvoices', [ InvoiceController::class, 'loggedUserInvoices']);
-
-    // Payments(create,view,edit and delete)
-    Route::apiResource('/payments', PaymentController::class);
+    Route::get('/count/invoices', [InvoiceController::class, 'totalInvoices']);
    
 
 

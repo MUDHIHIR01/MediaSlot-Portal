@@ -1,4 +1,4 @@
-import { NavItem } from "../ecommerce/types";
+import { NavItem } from "./types";
 
 interface DashboardCardProps {
   item: NavItem;

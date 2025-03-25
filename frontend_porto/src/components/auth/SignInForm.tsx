@@ -1,4 +1,3 @@
-
 import { useState, ChangeEvent, FormEvent } from "react";
 import { Link, useNavigate } from "react-router";
 import { EyeCloseIcon, EyeIcon } from "../../icons";
@@ -15,68 +14,82 @@ export default function SignInForm() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  
+
   const navigate = useNavigate();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+    e.preventDefault(); // Prevent default form submission
+    e.stopPropagation(); // Stop event bubbling
+
     setIsLoading(true);
 
+    const attemptLogin = async (retries = 2): Promise<void> => {
+      try {
+        const response = await axiosInstance.post('/api/auth/login', { email, password });
+        const successMessage = response.data.message || "Login successful!";
+        toast.success(successMessage, { position: "top-right", autoClose: 3000 });
+        // Store data in localStorage
+        localStorage.setItem("token", response.data.token as string);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+        localStorage.setItem("role_id", response.data.role_id as string);
+        setIsLoading(false);
+        navigate("/dashboard"); // Navigate only on success
+      } catch (err) {
+        const error = err as import("axios").AxiosError<{ message?: string }>;
+        if (error.request && retries > 0) {
+          toast.warn("Network issue detected, retrying...", { position: "top-right", autoClose: 1000 });
+          await new Promise((resolve) => setTimeout(resolve, 2000)); // Wait 2s
+          return attemptLogin(retries - 1);
+        }
+        throw err; // Rethrow for outer catch
+      }
+    };
+
     try {
-      const response = await axiosInstance.post('/api/auth/login', {
-        email,
-        password,
-      });
-
-      localStorage.setItem("token", response.data.token as string);
-      localStorage.setItem("user", JSON.stringify(response.data.user));
-      localStorage.setItem("role_id", response.data.role_id as string);
-
-      setIsLoading(false);
-      toast.success("Login successful!", {
-        position: "top-right",
-        autoClose: 3000,
-      });
-      navigate("/dashboard"); 
+      await attemptLogin();
     } catch (err) {
-      setIsLoading(false);
-      
+      setIsLoading(false); // Reset loading state on error
       const error = err as import("axios").AxiosError<{ message?: string }>;
-      
       if (error.response) {
-        toast.error(error.response.data?.message || "Login failed", {
-          position: "top-right",
-          autoClose: 3000,
-        });
+        const status = error.response.status;
+        const message = error.response.data?.message || "An error occurred";
+        switch (status) {
+          case 401:
+            toast.error(message, { position: "top-right", autoClose: 3000 }); // "Invalid credentials"
+            break;
+          case 403:
+            toast.error(message, { position: "top-right", autoClose: 3000 }); // "Account is not active"
+            break;
+          case 500:
+            toast.error(message, { position: "top-right", autoClose: 3000 }); // "An error occurred"
+            break;
+          default:
+            toast.error(message, { position: "top-right", autoClose: 3000 }); // Any other error
+        }
       } else if (error.request) {
-        toast.error("No response from server", {
-          position: "top-right",
-          autoClose: 3000,
-        });
+        toast.error("Failed to connect to server after retries", { position: "top-right", autoClose: 3000 });
       } else {
-        toast.error("An unexpected error occurred", {
-          position: "top-right",
-          autoClose: 3000,
-        });
+        console.error("Unexpected error:", error.message);
+        toast.error("Something went wrong. Please try again later", { position: "top-right", autoClose: 3000 });
       }
     }
   };
 
   const handleCheckboxChange = (checked: boolean) => setIsChecked(checked);
 
-  const handleLogoClick = () => navigate("/"); // Added handler for logo click
+  const handleLogoClick = () => navigate("/");
 
   return (
     <div className="flex shadow-md flex-col flex-1 items-center justify-center min-h-screen p-4 bg-gray-100 dark:bg-gray-900">
       <div className="w-full max-w-md">
         <div style={{ display: "flex", justifyContent: "center" }}>
-          <img 
-            width={100} 
-            height={48} 
-            src="/logo.png" 
-            alt="Logo" 
-            onClick={handleLogoClick} // Added onClick to navigate to "/"
-            style={{ cursor: "pointer" }} // Added cursor pointer for UX
+          <img
+            width={100}
+            height={48}
+            src="/logo.png"
+            alt="Logo"
+            onClick={handleLogoClick}
+            style={{ cursor: "pointer" }}
           />
         </div>
       </div>

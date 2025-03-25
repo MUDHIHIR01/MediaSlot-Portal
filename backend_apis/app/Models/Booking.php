@@ -14,7 +14,6 @@ class Booking extends Model
         'duration_type', 'duration_value', 'status',
     ];
 
-   
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');

@@ -23,9 +23,6 @@ import Home from "./pages/Dashboard/Home";
 import Roles from "./pages/userroles/Roles";
 import CreateRole from "./pages/userroles/CreateRole";
 import EditRole from "./pages/userroles/EditRole";
-import Departments from "./pages/departments/Departments";
-import CreateDepartment from "./pages/departments/CreateDepartment";
-import EditDepartment from "./pages/departments/EditDepartment";
 import Users from "./pages/users/Users";
 import CreateUser from "./pages/users/CreateUser";
 import EditUser from "./pages/users/EditUser";
@@ -33,11 +30,17 @@ import UserLogs from "./pages/userlogs/UserLogs";
 import HomePage from './pages/HomePage';
 import Contact from './pages/Contact'
 import About from "./pages/About";
-import  ProcessedSlotsPage from './components/ecommerce/ProcessedSlotsPage'
+import  ProcessedSlotsPage from './components/main/ProcessedSlotsPage'
 import { ReactNode } from "react";
-import InvoicesPage from './components/ecommerce/InvoicesPage'
-import UserBookings from './components/ecommerce/UserBookings'
-import UserInvoices from './components/ecommerce/UserInvoices'
+import InvoicesPage from './components/main/InvoicesPage'
+import UserBookings from './components/main/UserBookings'
+import UserInvoices from './components/main/UserInvoices'
+import  Bookings from './pages/bookings/Bookings'
+import  ConfirmBooking from './pages/bookings/ConfirmBooking'
+import  AllInvoices from './pages/invoices/AllInvoices'
+import  Adslots from './pages/ad_losts/Adslots'
+import  CreateAdSlot from './pages/ad_losts/CreateAdSlot'
+import  EditAdSlot from  './pages/ad_losts/EditAdSlot'
 
 // Define props for ProtectedRoute
 interface ProtectedRouteProps {
@@ -109,34 +112,6 @@ export default function App() {
               element={
                 <ProtectedRoute>
                   <CreateRole />
-                </ProtectedRoute>
-              }
-            />
-
-<Route
-              path="/departments"
-              element={
-                <ProtectedRoute>
-                  <Departments   />
-                </ProtectedRoute>
-              }
-            />
-
-<Route
-  path="/edit-department/:departmentId"
-  element={
-    <ProtectedRoute>
-      <EditDepartment />
-    </ProtectedRoute>
-  }
-/>
-
-
-<Route
-              path="/create-department"
-              element={
-                <ProtectedRoute>
-                  <CreateDepartment />
                 </ProtectedRoute>
               }
             />
@@ -224,6 +199,68 @@ export default function App() {
 
 />
 
+<Route
+  path="/bookings"
+  element={
+    <ProtectedRoute>
+      <Bookings />
+    </ProtectedRoute>
+  }
+
+/>
+
+
+<Route
+  path="/confirm-booking/:bookId"
+  element={
+    <ProtectedRoute>
+      <ConfirmBooking />
+    </ProtectedRoute>
+  }
+/>
+
+
+<Route
+  path="/view-invoices"
+  element={
+    <ProtectedRoute>
+      <AllInvoices />
+    </ProtectedRoute>
+  }
+
+/>
+
+
+<Route
+  path="/ad-slots"
+  element={
+    <ProtectedRoute>
+      <Adslots />
+    </ProtectedRoute>
+  }
+
+/>
+
+<Route
+  path="/create/ad-slot"
+  element={
+    <ProtectedRoute>
+      <CreateAdSlot />
+    </ProtectedRoute>
+  }
+
+/>
+
+
+
+<Route
+  path="/edit/ad-slot/:adslotId"
+  element={
+    <ProtectedRoute>
+      <EditAdSlot/>
+    </ProtectedRoute>
+  }
+/>
 
             <Route
               path="/calendar"

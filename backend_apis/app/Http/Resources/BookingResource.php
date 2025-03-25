@@ -10,7 +10,7 @@ class BookingResource extends JsonResource
     {
         return [
             'booking_id' => $this->booking_id,
-            'user_id' => $this->user_id,
+            'user' => new UserResource($this->whenLoaded('user')),
             'ad_slot_id' => $this->ad_slot_id,
             'quantity' => $this->quantity,
             'total_cost' => $this->total_cost,
