@@ -1,431 +1,64 @@
-<template>
-  <div class="p-4 dashboard" style="margin-top: 40px;color:white;max-height: 550px; overflow-y: auto;font-family: 'Times New Roman', serif;font-size: 14px ;font-style:oblique">
-    <div class="flex flex-wrap -mx-4">
+chat i have these sanario Project title Digital AD-slot system with these  Actors  Admin( do these  add role,edit,view and delete,  user also add, view,edit and delete, ad-slot (create ad-slot, view,edit and delete,),  view booking  and confirm, view invoice, User  register, login, view  ad-slots, create  book for  the selected ad-slot,  generate invoice for booking  ad-slot, pay for the  booking  made,  sytem is  web system  that am use   Mysql  as  database  , sql  as  database language, laravel  10 as  API's endpoint,React .js  and  vite and tailwind  css  , html   as  fronted,  npmm as  network  pachage  , github  as  version control  system,personal compute for deevlopment,router  for internet, also system prototyp  start from  login ,register, reset  pass,  Admin  dashboard  with PROFILE Users(create,view,edit  and  delete,)  View  logs, Ad-slot management, Booking management, invoice  management  and view  payment, User  module  prototype  const  of   PROFILE, VIEW AD-SLOT, BOOK AD-SLOT, GENERATE INVOICE , VIEW INVOICE,VIEW BOOKINGS, VIEW PAYMENTS,  AM SENT  SYSTEM  VIA  TWO WAY ONEN  ZIPPED  FILE  VIA GMAIL  WITH NAME MediaSlot-Portal  HOE  TO RUN  UNZIP THE FILE , INSIDE  THERE  THRE  FOLDERS  ONE  DATABASE FOLDER WITH DATABASE  NAME digital-slot_DB   SO  IMPORT   THE DATABASE  EG VIA  XAMPP,  WORK BENC OR LAMPP ,  SECOND FOLDER backend part apis(with name backend_apis (laravel as  programming language so how  to run  open on terminal composer instll, second php artisan serve  then we obtain local url like  this http://127.0.0.1:800 , third folder  fronted part with name frontend_porto (react .js  app) how  to run  make sure you have node.org  minum  17,  next  open onn terminal the folder  npm installl ,  then  npm run dev after  we obtain  local uri lie  this http://localhost:5174/  controller  clik the url or  copy past on brower  nex  we  see the  system  then home  page we ad-slots  displayed , then ifyou want  to login  credentials are these  for admin (email: nyemamudhihir@gmail.com passord: mudhihir01 , for User(client can use this email : normaluser01@gmail.com  and passord : normaluser01@gmail.com or  you can  sign up for  new  user  accoutn and login , so now   accord  to this  task give Caroline Mkinga
+Mar 24, 2025, 10:06 AM (1 day ago)
+to Frank, Siael, me
 
-    
+Hello Mudhihir,
 
-<!-- Users & Departments Card -->
-<div class="w-full px-4 mb-4 sm:w-1/2 lg:w-1/4">
-  <div class="h-full p-6 bg-gradient-to-r from-[#1f618d] to-[#2980b9] rounded-2xl shadow-2xl text-white transform transition-transform duration-300 hover:scale-105">
-    <div class="flex items-center gap-4 mb-4">
-      <i class="text-5xl text-yellow-300 fas fa-users-cog"></i>
-      <h2 class="text-xl font-extrabold">Users & Departments</h2>
-    </div>
-    <div class="space-y-2">
-      <div class="flex justify-between items-center">
-        <span class="text-lg">👥 User Roles:</span>
-        <span class="font-semibold text-xl">{{ totalRoles }}</span>
-      </div>
-      <div class="flex justify-between items-center">
-        <span class="text-lg">🙋 Users:</span>
-        <span class="font-semibold text-xl">{{ totalUsers }}</span>
-      </div>
-      <div class="flex justify-between items-center">
-        <span class="text-lg">🏢 Departments:</span>
-        <span class="font-semibold text-xl">{{ totalDepartments }}</span>
-      </div>
-    </div>
-  </div>
-</div>
+ 
 
+Please use the business case below.
 
+ 
 
-      
-     <!-- Tenders Card -->
-<div class="w-full px-4 mb-4 sm:w-1/2 lg:w-1/4">
-  <div class="h-full p-6 bg-gradient-to-r from-[#6e2c00] to-[#a04000] rounded-2xl shadow-2xl text-white transform transition-transform duration-300 hover:scale-105">
-    <div class="flex items-center gap-4 mb-4">
-      <i class="text-5xl text-yellow-400 fas fa-file-contract"></i>
-      <h2 class="text-xl font-extrabold">Tenders</h2>
-    </div>
-    <div class="space-y-2">
-      <div class="flex justify-between items-center">
-        <span class="text-lg">📌 Registered:</span>
-        <span class="font-semibold text-xl">{{ totalTenders }}</span>
-      </div>
-      <div class="flex justify-between items-center">
-  <span class="text-lg">📑 Assigned :</span>
-  <span class="font-semibold text-xl">{{ totalAssignedTenders }}</span>
-</div>
+Overview
 
-      <div class="flex justify-between items-center">
-        <span class="text-lg">📑 Submitted:</span>
-        <span class="font-semibold text-xl">{{ totalTenderSubmissions }}</span>
-      </div>
-      <div class="flex justify-between items-center">
-        <span class="text-lg">⚙️ In Progress:</span>
-        <span class="font-semibold text-xl">{{ totalTenders }}</span>
-      </div>
-      <div class="flex justify-between items-center">
-        <span class="text-lg">⏳ Deadline Reached:</span>
-        <span class="font-semibold text-xl">{{ totalTenders }}</span>
-      </div>
-      <div class="flex justify-between items-center">
-        <span class="text-lg">❌ Failed:</span>
-        <span class="font-semibold text-xl">{{ totalFailedTenders  }}</span>
-      </div>
-    </div>
-  </div>
-</div>
+ 
 
+Front End Developer is tasked with building a web application where users can look up available digital ad slots, check ad sizes, rates, and availability. The platform should allow users to select the number of ads they want to book, see the total cost dynamically, and generate an invoice for checkout.
 
-<!-- Project Analyses Card -->
-<div class="w-full px-4 mb-4 sm:w-1/2 lg:w-1/4">
-  <div class="h-full p-6 bg-gradient-to-r from-[#0e6251] to-[#1abc9c] rounded-2xl shadow-2xl text-white transform transition-transform duration-300 hover:scale-105">
-    <div class="flex items-center gap-4 mb-4">
-      <i class="text-5xl text-yellow-300 fas fa-chart-line"></i>
-      <h2 class="text-xl font-extrabold">Project Analyses</h2>
-    </div>
-    <div class="space-y-2">
-      <div class="flex justify-between items-center">
-        <span class="text-lg">📥 Incoming:</span>
-        <span class="font-semibold text-xl">{{ totalPricesSchedules }}</span>
-      </div>
-      <div class="flex justify-between items-center">
-        <span class="text-lg">✅ Approved:</span>
-        <span class="font-semibold text-xl">{{ totalPricesSchedules }}</span>
-      </div>
-      <div class="flex justify-between items-center">
-        <span class="text-lg">❌ Rejected:</span>
-        <span class="font-semibold text-xl">{{ totalPricesSchedules }}</span>
-      </div>
-    </div>
-  </div>
-</div>
+Core Features
 
+1. User Interface & Navigation
 
+The platform should be simple, intuitive, and easy to navigate.
+Users should be able to search and filter available ad slots based on position, size, and price.
+Avoid directly copying the reference example—creativity is encouraged.
+2. Ad Booking System
 
+Users should be able to select the number of ads they want to book.
+The system must calculate the total cost in real time.
+3. Checkout & Invoice Generation
 
-<!-- Price Schedules Card -->
-<div class="w-full px-4 mb-4 sm:w-1/2 lg:w-1/4">
-  <div class="h-full p-6 bg-gradient-to-r from-[#CD5C5C] to-[#CD5C5C] rounded-2xl shadow-2xl text-white transform transition-transform duration-300 hover:scale-105">
-    <div class="flex items-center gap-4 mb-4">
-      <i class="text-5xl text-yellow-300 fas fa-dollar-sign"></i>
-      <h2 class="text-xl font-extrabold">Price Schedules</h2>
-    </div>
-    <div class="space-y-2">
-      <div class="flex justify-between items-center">
-        <span class="text-lg">📥 Incoming:</span>
-        <span class="font-semibold text-xl">{{ totalPricesSchedules }}</span>
-      </div>
-      <div class="flex justify-between items-center">
-        <span class="text-lg">✅ Approved:</span>
-        <span class="font-semibold text-xl">{{ totalPricesSchedules }}</span>
-      </div>
-      <div class="flex justify-between items-center">
-        <span class="text-lg">❌ Rejected:</span>
-        <span class="font-semibold text-xl">{{ totalPricesSchedules }}</span>
-      </div>
-    </div>
-  </div>
-</div>
+Once ads are selected, users should be able to proceed to a checkout screen.
+An invoice should be generated with details of booked ads, total cost, and payment options.
+4. Technical Documentation
 
+Provide a breakdown of the technology stack (frontend, backend, database, hosting).
+Define API integrations (if needed for payments or other functionalities).
+Security measures for handling user data.
+Considerations for scalability and future enhancements.
+Reference Example
 
-  
-        <!-- Project Requests Card -->
-<div class="w-full px-4 mb-4 sm:w-1/2 lg:w-1/4">
-  <div class="h-full p-6 bg-gradient-to-r from-[#9a7d0a] to-[#d4ac0d] rounded-2xl shadow-2xl text-white transform transition-transform duration-300 hover:scale-105">
-    <div class="flex items-center gap-4 mb-4">
-      <i class="text-5xl text-yellow-300 fas fa-project-diagram"></i>
-      <h2 class="text-3xl font-extrabold">Project Requests</h2>
-    </div>
-    <div class="space-y-2">
-      <div class="flex justify-between items-center">
-        <span class="text-lg">📊 Total Projects:</span>
-        <span class="font-semibold text-xl">{{ totalProjects }}</span>
-      </div>
-      <div class="flex justify-between items-center">
-        <span class="text-lg">⚙️ On Progress:</span>
-        <span class="font-semibold text-xl">{{ totalOnProgressProjects }}</span>
-      </div>
-      <div class="flex justify-between items-center">
-        <span class="text-lg">✅ Completed:</span>
-        <span class="font-semibold text-xl">{{ totalCompletedProjects }}</span>
-      </div>
-      <div class="flex justify-between items-center">
-        <span class="text-lg">❌ Failed:</span>
-        <span class="font-semibold text-xl">{{ totalFailedProjects }}</span>
-      </div>
-    </div>
-  </div>
-</div>
+https://www.themediaant.com/digital/hindustantimes-website-advertising
+(Note: The design should be unique and not directly copied from this example.)
 
+Deliverables
 
-  <!-- Project  Card -->
-  <div class="w-full px-4 mb-4 sm:w-1/2 lg:w-1/4">
-  <div class="h-full p-6 bg-[#186a3b] rounded-2xl shadow-2xl text-white transform transition-transform duration-300 hover:scale-105">
-    <div class="flex items-center gap-4 mb-4">
-      <i class="text-5xl text-yellow-300 fas fa-project-diagram"></i>
-      <h2 class="text-3xl font-extrabold">Projects</h2>
-    </div>
-    <div class="space-y-2">
-      <div class="flex justify-between items-center">
-        <span class="text-lg">📊 Total Projects:</span>
-        <span class="font-semibold text-xl">{{ totalProjects }}</span>
-      </div>
-      <div class="flex justify-between items-center">
-        <span class="text-lg">⚙️ On Progress:</span>
-        <span class="font-semibold text-xl">{{ totalOnProgressProjects }}</span>
-      </div>
-      <div class="flex justify-between items-center">
-        <span class="text-lg">✅ Completed:</span>
-        <span class="font-semibold text-xl">{{ totalCompletedProjects }}</span>
-      </div>
-      <div class="flex justify-between items-center">
-        <span class="text-lg">❌ Failed:</span>
-        <span class="font-semibold text-xl">{{ totalFailedProjects }}</span>
-      </div>
-    </div>
-  </div>
-</div>
-  
-    </div>
+Prototype – A working design demo showcasing the core functionalities.
+Technical Specifications Document – Detailed implementation plan.
+Timeline & Milestones
 
-  </div>
-  <div class="text-center">
-    <div class="text-center mt-6">
-       <!-- Apex Chart Container -->
-       <div id="apex-multiple-column-charts" class="w-full px-4">
-        <apexchart type="line" :options="chartOptions" :series="chartSeries" height="400" />
-      </div>
-    </div>
-    <div>
-   
-  </div>
-</div>
-</template>
+Deadline: 72 hours from assignment acceptance.
+Evaluation Criteria
 
-<script setup>
-import { ref, onMounted } from 'vue';
-import axios from '@/axios'; // Ensure this points to your axios instance
-import VueApexCharts from "vue3-apexcharts";
+Functionality: The app must meet all feature requirements.
+Design & UX: Clean, user-friendly, and original UI.
+Code Quality: Best practices, scalability, and security.
+Documentation: Clear and thorough implementation details.
+Timely Submission: Meeting the 72-hour deadline.
+Additional Notes
 
-// Define the reactive variables to hold the data from the API responses
-const totalUsers = ref(0);
-
-
-// Function to fetch the total users count
-const fetchTotalUsers = async () => {
-  try {
-    const response = await axios.get('api/count/users');
-    totalUsers.value = response.data.total_users;
-  } catch (error) {
-    console.error('Error fetching total users:', error);
-  }
-};
-
-// Function to fetch the total roles count
-const fetchTotalRoles = async () => {
-  try {
-    const response = await axios.get('api/count/roles');
-    totalRoles.value = response.data.user_roles;
-  } catch (error) {
-    console.error('Error fetching total roles:', error);
-  }
-};
-
-// Function to fetch the total departments count
-const fetchTotalDepartments = async () => {
-  try {
-    const response = await axios.get('api/count/departments');
-    totalDepartments.value = response.data.total_departments;
-  } catch (error) {
-    console.error('Error fetching total departments:', error);
-  }
-};
-
-// Function to fetch the total tenders count
-const fetchTotalTenders = async () => {
-  try {
-    const response = await axios.get('api/count/registered-tenders');
-    totalTenders.value = response.data.registered_tenders;
-  } catch (error) {
-    console.error('Error fetching total tenders:', error);
-  }
-};
-
-// Function to fetch the total assigned tenders count
-const fetchTotalAssignedTenders = async () => {
-  try {
-    const response = await axios.get('api/count/assigned-tenders');
-    totalAssignedTenders.value = response.data.count_assigned_tenders;
-  } catch (error) {
-    console.error('Error fetching assigned tenders:', error);
-  }
-};
-
-// Function to fetch the total tender submissions count
-const fetchTotalTenderSubmissions = async () => {
-  try {
-    const response = await axios.get('api/count/tenders-submissions');
-    totalTenderSubmissions.value = response.data.submitted_tenders;
-  } catch (error) {
-    console.error('Error fetching tender submissions:', error);
-  }
-};
-
-// Function to fetch the total published tenders count
-const fetchTotalPublishedTenders = async () => {
-  try {
-    const response = await axios.get('api/count/published-tenders');
-    totalPublishedTenders.value = response.data.count_published_tenders;
-  } catch (error) {
-    console.error('Error fetching published tenders:', error);
-  }
-};
-
-// Function to fetch the total awarded tenders count
-const fetchTotalAwardedTenders = async () => {
-  try {
-    const response = await axios.get('api/count/awarded-tenders');
-    totalAwardedTenders.value = response.data.count_awarded_tenders;
-  } catch (error) {
-    console.error('Error fetching awarded tenders:', error);
-  }
-};
-
-// Function to fetch the total failed tenders count
-const fetchTotalFailedTenders = async () => {
-  try {
-    const response = await axios.get('api/count/failed-tenders');
-    totalFailedTenders.value = response.data.count_failed_tenders;
-  } catch (error) {
-    console.error('Error fetching failed tenders:', error);
-  }
-};
-
-// Function to fetch the total requests count
-const fetchTotalRequests = async () => {
-  try {
-    const response = await axios.get('api/count/requests');
-    totalRequests.value = response.data.totalRequests;
-  } catch (error) {
-    console.error('Error fetching total requests:', error);
-  }
-};
-
-// Function to fetch the total projects count
-const fetchTotalProjects = async () => {
-  try {
-    const response = await axios.get('api/count/total-projects');
-    totalProjects.value = response.data.count_total_projects;
-  } catch (error) {
-    console.error('Error fetching total projects:', error);
-  }
-};
-
-// Function to fetch the total failed projects count
-const fetchTotalFailedProjects = async () => {
-  try {
-    const response = await axios.get('api/count/failed-projects');
-    totalFailedProjects.value = response.data.total_failed_projects;
-  } catch (error) {
-    console.error('Error fetching failed projects:', error);
-  }
-};
-
-// Function to fetch the total completed projects count
-const fetchTotalCompletedProjects = async () => {
-  try {
-    const response = await axios.get('api/count/completed-projects');
-    totalCompletedProjects.value = response.data.total_completed_projects;
-  } catch (error) {
-    console.error('Error fetching completed projects:', error);
-  }
-};
-
-// Function to fetch the total project activities count
-const fetchTotalProjectActivities = async () => {
-  try {
-    const response = await axios.get('api/count/project-activities');
-    totalProjectActivities.value = response.data.activity_count;
-  } catch (error) {
-    console.error('Error fetching project activities:', error);
-  }
-};
-
-// Function to fetch the total budget
-const fetchTotalBudget = async () => {
-  try {
-    const response = await axios.get('api/count/total-budget');
-    totalBudget.value = response.data.data.total_budget;
-  } catch (error) {
-    console.error('Error fetching total budget:', error);
-  }
-};
-
-// Function to fetch the total receipts count
-const fetchTotalReceipts = async () => {
-  try {
-    const response = await axios.get('api/count/total-receipts');
-    totalReceipts.value = response.data.data.total_receipts;
-  } catch (error) {
-    console.error('Error fetching total receipts:', error);
-  }
-};
-
-// Function to fetch the total chats count
-const fetchTotalChats = async () => {
-  try {
-    const response = await axios.get('api/count/total-updates');
-    totalChats.value = response.data.data.updates_count;
-  } catch (error) {
-    console.error('Error fetching total chats:', error);
-  }
-};
-
-// Function to fetch the total attendance count
-const fetchTotalAttendances = async () => {
-  try {
-    const response = await axios.get('api/count/attendances');
-    totalAttendances.value = response.data.data.total_attendances;
-  } catch (error) {
-    console.error('Error fetching total attendances:', error);
-  }
-};
-
-// Function to fetch the total meeting minutes count
-const fetchTotalMeetingMinutes = async () => {
-  try {
-    const response = await axios.get('api/count/meeting-minutes');
-    totalMeetingMinutes.value = response.data.total_meeting_minutes;
-  } catch (error) {
-    console.error('Error fetching meeting minutes:', error);
-  }
-};
-
-// Call all fetch functions when the component is mounted
-onMounted(() => {
-  fetchTotalUsers();
-  fetchTotalRoles();
-  fetchTotalDepartments();
-  fetchTotalTenders();
-  fetchTotalAssignedTenders();
-  fetchTotalTenderSubmissions();
-  fetchTotalPublishedTenders();
-  fetchTotalAwardedTenders();
-  fetchTotalFailedTenders();
-  fetchTotalRequests();
-  fetchTotalProjects();
-  fetchTotalFailedProjects();
-  fetchTotalCompletedProjects();
-  fetchTotalProjectActivities();
-  fetchTotalBudget();
-  fetchTotalReceipts();
-  fetchTotalChats();
-  fetchTotalAttendances();
-  fetchTotalMeetingMinutes();
-});
-</script>
-
-<style scoped>
-/* Additional styles if needed */
-#apex-multiple-column-charts {
-  margin-top: 20px;
-}
-</style>
-
-
-
-
-
+Ensure the system is optimized for both desktop and mobile.
+Adhere to data protection and privacy standards.
+Consider future upgrades and flexibility in the design.
+Attached are our rates card to be digitized. ​so prepar  a good documentation full til ends i wan  to sent  to my ceo be  good  be clear  for img  protypes  leav can i insert , recommendation fix  with that  Later  we need  to implment  payment  module  by prepar  impl payment  getway then  need  to  buy api  either  bank  eg  crdb, npm ,tcb  or exim , or mobile  money likke  Mixx Yas ,  Airtel, M-pesa,Halopesa  am  to  streamline  online  payment   so  give full documentation 
